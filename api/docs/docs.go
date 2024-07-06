@@ -22,7 +22,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "This method gets tasks",
+                "description": "Retrieves all tasks from the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -30,9 +30,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TASK Tag"
+                    "Task"
                 ],
-                "summary": "GET TASKS",
+                "summary": "Retrieve all tasks",
                 "parameters": [
                     {
                         "type": "integer",
@@ -43,8 +43,8 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "List of tasks",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -52,22 +52,10 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.StandartError"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.ForbiddenError"
-                        }
-                    },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Error while getting tasks",
                         "schema": {
-                            "$ref": "#/definitions/models.StandartError"
+                            "$ref": "#/definitions/api.StandartError"
                         }
                     }
                 }
@@ -78,7 +66,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "This method creates tasks",
+                "description": "Create a new task with provided JSON payload",
                 "consumes": [
                     "application/json"
                 ],
@@ -86,12 +74,19 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "TASK"
+                    "Task"
                 ],
-                "summary": "CREATE TASKS",
+                "summary": "Create a new task",
                 "parameters": [
                     {
-                        "description": "Task",
+                        "type": "string",
+                        "description": "Bearer token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Task object to be created",
                         "name": "body",
                         "in": "body",
                         "required": true,
@@ -102,27 +97,156 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Task created successfully",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid data",
                         "schema": {
-                            "$ref": "#/definitions/models.StandartError"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden",
-                        "schema": {
-                            "$ref": "#/definitions/models.ForbiddenError"
+                            "$ref": "#/definitions/api.StandartError"
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
+                        "description": "Error while creating tasks",
                         "schema": {
-                            "$ref": "#/definitions/models.StandartError"
+                            "$ref": "#/definitions/api.StandartError"
+                        }
+                    }
+                }
+            }
+        },
+        "/tasks/{id}": {
+            "get": {
+                "description": "Retrieves a task from the database by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Retrieve a task by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task details",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Task does not exist",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a task in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Update a task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated task object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated task details",
+                        "schema": {
+                            "$ref": "#/definitions/models.Task"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Request denied",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a task from the database by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Task"
+                ],
+                "summary": "Delete a task",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Task ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Task deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Request denied",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -130,18 +254,12 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.ForbiddenError": {
+        "api.StandartError": {
             "type": "object",
             "properties": {
-                "message": {
+                "error": {
                     "type": "string"
                 }
-            }
-        },
-        "models.StandartError": {
-            "type": "object",
-            "properties": {
-                "error": {}
             }
         },
         "models.Task": {

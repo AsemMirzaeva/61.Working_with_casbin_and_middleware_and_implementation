@@ -1,12 +1,8 @@
 definitions:
-  models.ForbiddenError:
+  api.StandartError:
     properties:
-      message:
+      error:
         type: string
-    type: object
-  models.StandartError:
-    properties:
-      error: {}
     type: object
   models.Task:
     properties:
@@ -29,7 +25,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: This method gets tasks
+      description: Retrieves all tasks from the database
       parameters:
       - description: ID
         in: query
@@ -39,35 +35,32 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: List of tasks
           schema:
             items:
               $ref: '#/definitions/models.Task'
             type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.StandartError'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/models.ForbiddenError'
         "500":
-          description: Internal Server Error
+          description: Error while getting tasks
           schema:
-            $ref: '#/definitions/models.StandartError'
+            $ref: '#/definitions/api.StandartError'
       security:
       - BearerAuth: []
-      summary: GET TASKS
+      summary: Retrieve all tasks
       tags:
-      - TASK Tag
+      - Task
     post:
       consumes:
       - application/json
-      description: This method creates tasks
+      description: Create a new task with provided JSON payload
       parameters:
-      - description: Task
+      - description: Bearer token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Task object to be created
         in: body
         name: body
         required: true
@@ -77,26 +70,109 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Task created successfully
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Invalid data
           schema:
-            $ref: '#/definitions/models.StandartError'
-        "403":
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/models.ForbiddenError'
+            $ref: '#/definitions/api.StandartError'
         "500":
-          description: Internal Server Error
+          description: Error while creating tasks
           schema:
-            $ref: '#/definitions/models.StandartError'
+            $ref: '#/definitions/api.StandartError'
       security:
       - BearerAuth: []
-      summary: CREATE TASKS
+      summary: Create a new task
       tags:
-      - TASK
+      - Task
+  /tasks/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a task from the database by its ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task deleted successfully
+          schema:
+            type: string
+        "500":
+          description: Request denied
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete a task
+      tags:
+      - Task
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a task from the database by its ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task details
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Task does not exist
+          schema:
+            type: string
+      summary: Retrieve a task by ID
+      tags:
+      - Task
+    put:
+      consumes:
+      - application/json
+      description: Updates a task in the database
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated task object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated task details
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: Invalid request
+          schema:
+            type: string
+        "500":
+          description: Request denied
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Update a task
+      tags:
+      - Task
 securityDefinitions:
   BearerAuth:
     in: header
